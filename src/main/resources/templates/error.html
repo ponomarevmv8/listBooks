@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Страница не найдена</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+
+    <style>
+        body {
+            background-color: #f8f9fa;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+        }
+
+        .error-card {
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .error-code {
+            font-size: 5rem;
+            font-weight: bold;
+            color: #6c757d;
+            opacity: 0.3;
+            position: absolute;
+            top: 20px;
+            right: 30px;
+        }
+
+        .error-image {
+            max-width: 250px;
+            margin-bottom: 2rem;
+        }
+    </style>
+</head>
+<body>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card error-card position-relative">
+                <div class="error-code">404</div>
+
+                <div class="card-body text-center p-5">
+                    <div class="mb-4">
+                        <i class="bi bi-search display-1 text-secondary"></i>
+                    </div>
+
+                    <h1 class="display-6 mb-3">Страница не найдена</h1>
+
+                    <p class="lead mb-4">К сожалению, запрашиваемая страница не существует или была перемещена.</p>
+
+                    <div class="text-muted mb-4">
+                        <p>Возможно, вы перешли по устаревшей ссылке или ввели неверный адрес.</p>
+                        <p>Проверьте URL или воспользуйтесь навигацией ниже.</p>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                        <a th:href="@{/books}" class="btn btn-primary">
+                            <i class="bi bi-book me-2"></i>Перейти к списку книг
+                        </a>
+                    </div>
+                </div>
+
+                <div class="card-footer bg-light text-center py-3">
+                    <small class="text-muted">Если вы уверены, что эта страница должна существовать, пожалуйста, сообщите об ошибке администратору.</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

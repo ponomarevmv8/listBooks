@@ -1,0 +1,374 @@
+openapi: 3.0.1
+info:
+  title: Book API
+  description: API для управления книгами
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8080
+    description: Локальный сервер разработки
+tags:
+  - name: books
+    description: Операции с книгами
+
+security:
+  - basicAuth: []
+
+paths:
+  /api/books:
+    get:
+      tags:
+        - books
+      summary: Получить все книги
+      description: Возвращает список всех книг из базы данных
+      operationId: findAll
+      security:
+        - basicAuth: []
+      responses:
+        '200':
+          description: Список книг успешно получен
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BookDto'
+        '401':
+          description: Не авторизован
+        '403':
+          description: Доступ запрещен
+    post:
+      tags:
+        - books
+      summary: Создать новую книгу
+      description: Создает новую книгу в базе данных
+      operationId: create
+      security:
+        - basicAuth: []
+      requestBody:
+        description: Данные для создания книги
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookCreation'
+      responses:
+        '201':
+          description: Книга успешно создана
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookDto'
+        '400':
+          description: Некорректный запрос
+        '401':
+          description: Не авторизован
+        '403':
+          description: Доступ запрещен
+
+  /api/books/{id}:
+    get:
+      tags:
+        - books
+      summary: Получить книгу по ID
+      description: Возвращает книгу по указанному идентификатору
+      operationId: findById
+      security:
+        - basicAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: ID книги
+          required: true
+          schema:
+            type: integer
+            format: int64
+          example: 1
+      responses:
+        '200':
+          description: Книга найдена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookDto'
+        '404':
+          description: Книга не найдена
+        '401':
+          description: Не авторизован
+        '403':
+          description: Доступ запрещен
+    put:
+      tags:
+        - books
+      summary: Обновить книгу
+      description: Обновляет существующую книгу по указанному ID
+      operationId: update
+      security:
+        - basicAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: ID книги
+          required: true
+          schema:
+            type: integer
+            format: int64
+          example: 1
+      requestBody:
+        description: Данные для обновления книги
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookUpdate'
+      responses:
+        '200':
+          description: Книга успешно обновлена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookDto'
+        '404':
+          description: Книга не найдена
+        '400':
+          description: Некорректный запрос
+        '401':
+          description: Не авторизован
+        '403':
+          description: Доступ запрещен
+    delete:
+      tags:
+        - books
+      summary: Удалить книгу
+      description: Удаляет книгу по указанному ID
+      operationId: delete
+      security:
+        - basicAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: ID книги
+          required: true
+          schema:
+            type: integer
+            format: int64
+          example: 1
+      responses:
+        '204':
+          description: Книга успешно удалена
+        '404':
+          description: Книга не найдена
+        '401':
+          description: Не авторизован
+        '403':
+          description: Доступ запрещен
+
+  /api/books/search:
+    get:
+      tags:
+        - books
+      summary: Поиск книг по параметрам
+      description: Выполняет поиск книг по названию, издательству и году с поддержкой пагинации и сортировки
+      operationId: findBookEntitiesByTitleAndBrandAndYear
+      security:
+        - basicAuth: []
+      parameters:
+        - name: title
+          in: query
+          description: Название книги (частичное совпадение)
+          required: false
+          schema:
+            type: string
+          example: "Властелин колец"
+        - name: brand
+          in: query
+          description: Издательство
+          required: false
+          schema:
+            type: string
+          example: "АСТ"
+        - name: year
+          in: query
+          description: Год издания
+          required: false
+          schema:
+            type: integer
+            format: int32
+          example: 2020
+        - name: page
+          in: query
+          description: Номер страницы (начиная с 0)
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 0
+          example: 0
+        - name: size
+          in: query
+          description: Размер страницы
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 10
+          example: 10
+        - name: sort
+          in: query
+          description: Поле для сортировки
+          required: false
+          schema:
+            type: string
+            default: "id"
+            enum: ["id", "title", "year", "brand"]
+          example: "id"
+        - name: direction
+          in: query
+          description: Направление сортировки
+          required: false
+          schema:
+            type: string
+            default: "asc"
+            enum: ["asc", "desc"]
+          example: "asc"
+      responses:
+        '200':
+          description: Результаты поиска успешно получены
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BookDto'
+        '401':
+          description: Не авторизован
+        '403':
+          description: Доступ запрещен
+
+components:
+  # Определение схемы безопасности Basic Auth
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+      description: Базовая HTTP аутентификация. Требуется имя пользователя и пароль.
+
+  schemas:
+    BookDto:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Уникальный идентификатор книги
+          example: 1
+        vendorCode:
+          type: string
+          description: Код товара
+          example: "BK-12345"
+        title:
+          type: string
+          description: Название книги
+          example: "1984"
+        brand:
+          type: string
+          description: Издательство
+          example: "АСТ"
+        year:
+          type: integer
+          format: int32
+          description: Год издания
+          example: 2021
+        stock:
+          type: integer
+          format: int32
+          description: Количество на складе
+          example: 25
+        price:
+          type: number
+          format: double
+          description: Цена книги
+          example: 599.99
+
+    BookCreation:
+      type: object
+      required:
+        - vendorCode
+        - title
+        - year
+        - brand
+        - stock
+        - price
+      properties:
+        vendorCode:
+          type: string
+          description: Код товара (обязательное поле)
+          example: "BK-12345"
+          minLength: 1
+        title:
+          type: string
+          description: Название книги (обязательное поле)
+          example: "1984"
+          minLength: 1
+        year:
+          type: integer
+          format: int32
+          description: Год издания (обязательное поле)
+          minimum: 1800
+          maximum: 2025
+          example: 2021
+        brand:
+          type: string
+          description: Издательство (обязательное поле)
+          example: "АСТ"
+          minLength: 1
+        stock:
+          type: integer
+          format: int32
+          description: Количество на складе (обязательное поле)
+          minimum: 0
+          example: 25
+        price:
+          type: number
+          format: double
+          description: Цена книги (обязательное поле)
+          minimum: 0
+          example: 599.99
+
+    BookUpdate:
+      type: object
+      properties:
+        vendorCode:
+          type: string
+          description: Код товара
+          example: "BK-12345"
+          minLength: 1
+        title:
+          type: string
+          description: Название книги
+          example: "1984"
+          minLength: 1
+        year:
+          type: integer
+          format: int32
+          description: Год издания
+          minimum: 1800
+          maximum: 2025
+          example: 2021
+        brand:
+          type: string
+          description: Издательство
+          example: "АСТ"
+          minLength: 1
+        stock:
+          type: integer
+          format: int32
+          description: Количество на складе
+          minimum: 0
+          example: 25
+        price:
+          type: number
+          format: double
+          description: Цена книги
+          minimum: 0
+          example: 599.99
